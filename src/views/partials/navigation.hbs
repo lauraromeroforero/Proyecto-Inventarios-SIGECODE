@@ -1,0 +1,56 @@
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="/products/all">
+      <i class="fas fa-clipboard-list"></i> Inventario Macrodent - Centro de Fresado
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        {{#if user}}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Productos de inventario
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/products/all">Productos existentes</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/products/add">Agregar Productos</a>
+            <div class="dropdown-divider"></div>
+            <!-- ⬇️ Botón para abrir Modal Subir Excel nuevos productos-->
+            <a class="dropdown-item" data-toggle="modal" data-target="#uploadExcelModalProducts" href="">Subir Nuevos
+              Productos</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/products/historial">Historial de cambios</a>
+            <div class="dropdown-divider"></div>
+            <a href="/products/descargar-excel-productos" class="dropdown-item">Descargar Excel Con Datos</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/products/scan">Agregar nuevo pedido</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/products/scanrecount">Re conteo de inventario...</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/products/remision/confirmar">Confirmar Remisiones</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/profile">Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
+        {{else}}
+        <li class="nav-item">
+          <a class="nav-link" href="/signin">SignIn</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/signup">SignUp</a>
+        </li>
+        {{/if}}
+      </ul>
+    </div>
+  </div>
+</nav>
+{{> modals/uploadExcelProductsModal}}

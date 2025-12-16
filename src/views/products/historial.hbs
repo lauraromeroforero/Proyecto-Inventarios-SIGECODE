@@ -1,0 +1,321 @@
+{{!--
+  Vista: historial.hbs
+  Uso: Renderizar historial de inventario agrupado por fecha.
+  Requiere: helpers ver más abajo (tipoBadge, formatDateLabel, hhmm)
+
+  Contexto esperado desde el controlador:
+  {
+    title: 'Historial de Inventario',
+    groups: [
+      {
+        dateISO: '2025-09-04',            // yyyy-mm-dd
+        dateLabel: 'Jue · 04 Sep 2025',    // opcional si prefieres formatear en backend
+        movimientos: [
+          {
+            productoNombre: 'AIZIR Zirconia A2 · H20',
+            productoDetalle: 'AIZIR · 20 mm',
+            lote: 'L-AG25-0923',
+            cantidad: 12,                   // número (positivo o negativo)
+            tipo: 'entrada',                // 'entrada' | 'salida' | 'ajuste' | 'remision'
+            operarioNombre: 'Javier López',
+            observaciones: 'Ingreso por compra – Proveedor Aidite',
+            fecha: '2025-09-04T09:21:00Z',  // ISO datetime
+            horaLocal: '09:21',             // opcional si ya viene calculada
+            textIndex: 'aizir zirconia a2 h20 javier ingreso compra proveedor aidite'
+          }
+        ]
+      }
+    ]
+  }
+--}}
+
+<div class="container my-4">
+  {{!-- Header local (tu navbar va en el layout) --}}
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h1 class="h4 fw-bold mb-1">Historial de Inventario</h1>
+      <p class="text-secondary mb-0">Registros agrupados por fecha. Filtra por texto, tipo o rango.</p>
+    </div>
+    <div class="d-none d-md-flex gap-2 align-items-center">
+      <span class="badge text-bg-light border"><i class="bi bi-hdd-stack me-1"></i> Macrodent</span>
+    </div>
+  </div>
+
+  {{!-- Filtros --}}
+  <div class="p-3 p-md-4 mb-4 bg-white border rounded-3 shadow-sm" id="filtersCard">
+    <div class="row g-3 align-items-end">
+      <div class="col-12 col-lg-5">
+        <label class="form-label">Buscar</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input id="q" type="text" class="form-control" placeholder="Producto, lote, operario, observación…">
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <label class="form-label">Tipo de movimiento</label>
+        <select id="tipo" class="form-select">
+          <option value="">Todos</option>
+          <option value="entrada">Entrada</option>
+          <option value="salida">Salida</option>
+          <option value="ajuste">Ajuste</option>
+          <option value="remision">Remisión</option>
+        </select>
+      </div>
+      <div class="col-6 col-lg-2">
+        <label class="form-label">Desde</label>
+        <input id="desde" type="date" class="form-control">
+      </div>
+      <div class="col-6 col-lg-2">
+        <label class="form-label">Hasta</label>
+        <input id="hasta" type="date" class="form-control">
+      </div>
+      <div class="col-6 col-lg-2 ms-auto text-end">
+        <button id="limpiar" class="btn btn-outline-secondary w-100"><i class="bi bi-eraser me-1"></i> Limpiar</button>
+      </div>
+    </div>
+  </div>
+
+  {{!-- Secciones por fecha --}}
+  {{#if groups}}
+    {{#each groups}}
+      <section class="mb-5" data-section-date="{{this.dateISO}}">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="date-chip border rounded-pill px-3 py-1 bg-white">
+            <i class="bi bi-calendar-event me-1"></i>
+            {{#if this.dateLabel}}
+              {{this.dateLabel}}
+            {{else}}
+              {{formatDateLabel this.dateISO}}
+            {{/if}}
+            <span class="ms-2 text-secondary">(<span class="count">{{this.movimientos.length}}</span>)</span>
+          </span>
+          <button class="btn btn-sm btn-light border ms-2 toggle-section" type="button" aria-expanded="true" aria-controls="tbl-{{this.dateISO}}">
+            <i class="bi bi-caret-down-fill caret"></i>
+            <span class="ms-1 d-none d-sm-inline">Contraer</span>
+          </button>
+        </div>
+        <div class="card border rounded-3 shadow-sm" id="tbl-{{this.dateISO}}">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th style="min-width:220px;">Producto</th>
+                  <th>Lote</th>
+                  <th class="text-center">Cant.</th>
+                  <th>Tipo</th>
+                  <th>Operario</th>
+                  <th>Observaciones</th>
+                  <th style="min-width:160px;">Fecha/Hora</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each this.movimientos}}
+                  <tr data-date="{{../dateISO}}" data-tipo="{{this.tipo}}" data-text="{{this.textIndex}}">
+                    <td>
+                      <div class="fw-semibold">{{this.productoNombre}}</div>
+                      {{#if this.productoDetalle}}
+                        <div class="small text-secondary">{{this.productoDetalle}}</div>
+                      {{/if}}
+                    </td>
+                    <td><span class="badge text-bg-light border">{{this.lote}}</span></td>
+                    <td class="text-center fw-semibold">{{#if (lt this.cantidad 0)}}−{{abs this.cantidad}}{{else}}+{{this.cantidad}}{{/if}}</td>
+                    <td>{{{tipoBadge this.tipo}}}</td>
+                    <td><i class="bi bi-person-badge me-1"></i> {{this.operarioNombre}}</td>
+                    <td class="text-truncate" style="max-width: 260px;">{{this.observaciones}}</td>
+                    <td>{{#if this.horaLocal}}{{this.horaLocal}}{{else}}{{hhmm this.fecha}}{{/if}}</td>
+                    <td class="text-end">
+                      <button class="btn btn-sm btn-outline-primary show-details" data-bs-toggle="modal" data-bs-target="#detailsModal" aria-label="Ver detalles">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    </td>
+                  </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    {{/each}}
+  {{else}}
+    <div id="empty" class="text-center p-5 border rounded-3 bg-white">
+      <i class="bi bi-inboxes"></i>
+      <p class="mt-2 mb-0">No hay registros de historial.</p>
+    </div>
+  {{/if}}
+</div>
+
+{{!-- Modal Detalles --}}
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalles del movimiento</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex flex-column gap-1">
+          <div><span class="text-secondary small">Producto: </span> <span id="d-prod" class="fw-semibold"></span></div>
+          <div><span class="text-secondary small">Lote: </span> <span id="d-lote"></span></div>
+          <div><span class="text-secondary small">Cantidad: </span> <span id="d-cant" class="fw-semibold"></span></div>
+          <div><span class="text-secondary small">Tipo: </span> <span id="d-tipo" class="badge"></span></div>
+          <div><span class="text-secondary small">Operario: </span> <span id="d-op"></span></div>
+          <div><span class="text-secondary small">Observaciones: </span> <span id="d-obs"></span></div>
+          <div><span class="text-secondary small">Fecha/Hora: </span> <span id="d-fecha"></span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- Scripts específicos de esta vista --}}
+<script>
+  (function(){
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+    const q = $('#q');
+    const tipo = $('#tipo');
+    const desde = $('#desde');
+    const hasta = $('#hasta');
+    const limpiar = $('#limpiar');
+
+    function badgeFor(tipo){
+      const span = document.createElement('span');
+      span.classList.add('badge');
+      span.classList.add('fw-semibold');
+      if(tipo==='entrada'){ span.classList.add('text-bg-success','bg-opacity-10'); span.style.border = '1px solid #bfe8d1'; span.style.color = '#137c46';}
+      if(tipo==='salida'){ span.classList.add('text-bg-danger','bg-opacity-10');  span.style.border = '1px solid #ffd7db'; span.style.color = '#b42318';}
+      if(tipo==='ajuste'){ span.classList.add('text-bg-primary','bg-opacity-10'); span.style.border = '1px solid #dbe6ff'; span.style.color = '#2f5fe2';}
+      if(tipo==='remision'){ span.classList.add('text-bg-warning','bg-opacity-10'); span.style.border = '1px solid #ffe9bf'; span.style.color = '#a15c00';}
+      span.textContent = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+      return span;
+    }
+
+    // Modal detalles
+    $$(".show-details").forEach(btn => {
+      btn.addEventListener('click', (e)=>{
+        const tr = e.target.closest('tr');
+        const tds = tr.querySelectorAll('td');
+        $('#d-prod').textContent  = tds[0].innerText.trim();
+        $('#d-lote').textContent  = tds[1].innerText.trim();
+        $('#d-cant').textContent  = tds[2].innerText.trim();
+        const tipoStr = tr.dataset.tipo;
+        const badge = badgeFor(tipoStr);
+        const dTipo = $('#d-tipo');
+        dTipo.className = 'badge';
+        dTipo.replaceWith(badge); badge.id = 'd-tipo';
+        $('#d-op').textContent    = tds[4].innerText.trim();
+        $('#d-obs').textContent   = tds[5].innerText.trim();
+        const date = tr.dataset.date + ' · ' + tds[6].innerText.trim();
+        $('#d-fecha').textContent = date;
+      });
+    });
+
+    // Colapsar secciones
+    $$(".toggle-section").forEach(btn =>{
+      btn.addEventListener('click', ()=>{
+        const card = document.getElementById(btn.getAttribute('aria-controls'));
+        const isShown = btn.getAttribute('aria-expanded') === 'true';
+        card.closest('section').classList.toggle('section-collapsed', isShown);
+        card.style.display = isShown ? 'none' : '';
+        btn.setAttribute('aria-expanded', !isShown);
+      });
+    });
+
+    function matchesFilters(tr){
+      const text = (tr.dataset.text || '').toLowerCase();
+      const s = (q?.value || '').trim().toLowerCase();
+      if(s && !text.includes(s)) return false;
+
+      const t = tipo?.value;
+      if(t && tr.dataset.tipo !== t) return false;
+
+      const d = tr.dataset.date; // yyyy-mm-dd
+      const from = desde?.value; const to = hasta?.value;
+      if(from && d < from) return false;
+      if(to && d > to) return false;
+      return true;
+    }
+
+    function applyFilters(){
+      let visibleRows = 0;
+      document.querySelectorAll('section[data-section-date]').forEach(section =>{
+        const rows = section.querySelectorAll('tbody tr');
+        let count = 0;
+        rows.forEach(tr =>{
+          const ok = matchesFilters(tr);
+          tr.style.display = ok ? '' : 'none';
+          if(ok){ count++; visibleRows++; }
+        });
+        section.querySelector('.count').textContent = count;
+        section.style.display = count ? '' : 'none';
+      });
+      const empty = document.getElementById('empty');
+      if(empty) empty.style.display = visibleRows ? 'none' : 'block';
+    }
+
+    [q, tipo, desde, hasta].forEach(el => el && el.addEventListener('input', applyFilters));
+    limpiar && limpiar.addEventListener('click', ()=>{
+      if(q) q.value = '';
+      if(tipo) tipo.value = '';
+      if(desde) desde.value = '';
+      if(hasta) hasta.value = '';
+      applyFilters();
+    });
+
+    applyFilters();
+  })();
+</script>
+
+{{!--
+  === helpers/inventory-history.js ===
+  Registra los helpers en Express-Handlebars.
+
+  const dayjs = require('dayjs');
+  const utc = require('dayjs/plugin/utc');
+  const timezone = require('dayjs/plugin/timezone');
+  const localizedFormat = require('dayjs/plugin/localizedFormat');
+  dayjs.extend(utc); dayjs.extend(timezone); dayjs.extend(localizedFormat);
+
+  module.exports = {
+    // Muestra Jue · 04 Sep 2025 (si no pasas dateLabel desde el backend)
+    formatDateLabel: (dateISO) => {
+      if(!dateISO) return '';
+      const d = dayjs(dateISO);
+      const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+      const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      return `${dias[d.day()]} · ${String(d.date()).padStart(2,'0')} ${meses[d.month()]} ${d.year()}`;
+    },
+
+    // 09:21 local
+    hhmm: (iso) => {
+      if(!iso) return '';
+      const d = dayjs(iso).local();
+      return d.format('HH:mm');
+    },
+
+    // Badge HTML seguro
+    tipoBadge: (tipo) => {
+      const map = {
+        entrada: { cls: 'badge text-bg-success bg-opacity-10', style: 'border:1px solid #bfe8d1; color:#137c46;' },
+        salida:  { cls: 'badge text-bg-danger bg-opacity-10',  style: 'border:1px solid #ffd7db; color:#b42318;' },
+        ajuste:  { cls: 'badge text-bg-primary bg-opacity-10', style: 'border:1px solid #dbe6ff; color:#2f5fe2;' },
+        remision:{ cls: 'badge text-bg-warning bg-opacity-10', style: 'border:1px solid #ffe9bf; color:#a15c00;' },
+      };
+      const m = map[tipo] || { cls: 'badge text-bg-secondary', style: '' };
+      return new (require('handlebars').SafeString)(`<span class="${m.cls}" style="${m.style}">${(tipo||'').charAt(0).toUpperCase() + (tipo||'').slice(1)}</span>`);
+    },
+
+    // Comparadores simples si los necesitas
+    lt: (a,b) => Number(a) < Number(b),
+    abs: (v) => Math.abs(Number(v))
+  };
+
+  // En tu setup de handlebars:
+  // const hbs = exphbs.create({ helpers: require('./helpers/inventory-history') });
+  // app.engine('.hbs', hbs.engine);
+--}}

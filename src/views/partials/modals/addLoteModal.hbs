@@ -1,0 +1,43 @@
+<!-- Modal para agregar un lote a un producto -->
+<div class="modal fade" id="cantidadmasModal" tabindex="-1" role="dialog" aria-labelledby="addLoteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addLoteModalLabel">Agregar Lote al Producto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/products/lotes/add" method="POST">
+                    <!-- ID del producto oculto -->
+                    <input type="hidden" name="id_productos" id="id_producto_lote">
+                    <!-- Número de lote -->
+                    <div class="form-group">
+                        <label for="nro_lote">Número de Lote:</label>
+                        <input type="text" class="form-control" name="nro_lote" id="nro_lote" required>
+                    </div>
+                    <!-- Cantidad -->
+                    <div class="form-group">
+                        <label for="cantidad">Cantidad:</label>
+                        <input type="number" class="form-control" name="cantidad" id="cantidad_lote" min="1" required>
+                    </div>
+                    <!-- Fecha de vencimiento -->
+                    <div class="form-group">
+                        <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
+                        <input type="date" class="form-control" name="fecha_vencimiento" id="fecha_vencimiento" required>
+                    </div>
+                    <!-- Botón de envío -->
+                    <button type="submit" class="btn btn-primary">Guardar Lote</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function openIncreaseQuantityModal(idProducto) {
+        document.getElementById('id_producto_lote').value = idProducto;
+        $('#cantidadmasModal').modal('show');
+    }
+</script>

@@ -1,0 +1,280 @@
+<div class="container py-3" style="max-width: 500px;">
+    <h4 class="text-center text-primary mb-3">Conteo de Inventario</h4>
+
+    <!-- 📷 ESCANEO EN TIEMPO REAL -->
+    <div class="card shadow-sm p-3 mb-3 bg-white rounded">
+        <h5 class="text-center">Escaneo en vivo</h5>
+        <div class="text-center" id="videoContainer">
+            <video id="video" class="rounded border border-primary shadow-sm" width="100%" height="auto"
+                autoplay></video>
+        </div>
+        <p id="result" class="alert alert-info text-center mt-2">Esperando escaneo...</p>
+    </div>
+
+    <!-- 📸 ESCANEO DESDE IMAGEN -->
+    <div class="card shadow-sm p-3 bg-white rounded">
+        <h5 class="text-center">Subir imagen</h5>
+        <input type="file" id="fileInput" class="form-control mb-2" accept="image/*">
+        <img id="imagenCodigo" class="d-none mx-auto img-thumbnail shadow-sm" style="max-width: 100%;">
+        <p id="imageResult" class="alert alert-secondary text-center mt-2">Esperando escaneo...</p>
+    </div>
+
+    <!-- 📊 RESULTADOS DEL CONTEO -->
+    <div class="card shadow-sm p-3 mt-3 bg-light">
+        <h5 class="text-center">Conteo de productos</h5>
+        <ul id="listaConteo" class="list-group"></ul>
+        <button class="btn btn-success w-100 mt-2" onclick="finalizarConteo()">Finalizar conteo</button>
+        <button id="btnActualizarInventario" style="display: none;" onclick="actualizarInventario()">Actualizar
+            Inventario</button>
+    </div>
+</div>
+
+<script type="module">
+    import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/library@latest/+esm';
+
+    const codeReader = new BrowserMultiFormatReader();
+    const videoElement = document.getElementById('video');
+    const resultElement = document.getElementById('result');
+    const listaConteo = document.getElementById('listaConteo');
+    let conteoTemporal = {};
+    let lastScanTime = 0;
+
+    // EXTRAER CODIGO DAMATRIX
+
+    function extraerDatos(codigoMatrix) {
+        // Expresiones regulares mejoradas
+        const codigoBarrasMatch = codigoMatrix.match(/\(01\)(.+?)(?=\(11\)|\(17\)|\(10\)|$)/);
+        const fechaProduccionMatch = codigoMatrix.match(/\(11\)(\d{6})/);
+        const fechaExpiracionMatch = codigoMatrix.match(/\(17\)(\d{6})/);
+        const loteMatch = codigoMatrix.match(/\(10\)(.+)$/);
+
+        // Extraer los datos con valores por defecto si no se encuentran
+        const codigoBarras = codigoBarrasMatch ? codigoBarrasMatch[1].trim() : 'Desconocido';
+        const fechaProduccion = fechaProduccionMatch ? formatearFecha(fechaProduccionMatch[1]) : 'Sin fecha';
+        const fechaExpiracion = fechaExpiracionMatch ? formatearFecha(fechaExpiracionMatch[1]) : 'Sin fecha';
+        const lote = loteMatch ? loteMatch[1] : 'Sin lote';
+
+        // Retornar datos extraídos
+        return {
+            codigoBarras,
+            fechaProduccion,
+            fechaExpiracion,
+            lote
+        };
+    }
+
+    // Función para formatear la fecha de YYMMDD a YYYY-MM-DD
+    function formatearFecha(fechaYYMMDD) {
+        const año = "20" + fechaYYMMDD.substring(0, 2);
+        const mes = fechaYYMMDD.substring(2, 4);
+        const dia = fechaYYMMDD.substring(4, 6);
+        return `${año}-${mes}-${dia}`;
+    }
+
+    async function startVideoScanner() {
+        try {
+            await codeReader.decodeFromVideoDevice(null, videoElement, (result, err) => {
+                if (result) {
+                    const now = Date.now();
+                    if (now - lastScanTime > 2000) {
+                        lastScanTime = now;
+                        procesarCodigoEscaneado(result.text, resultElement);
+                    }
+                }
+            });
+        } catch (error) {
+            console.error("Error al acceder a la cámara:", error);
+        }
+    }
+
+    // 📸 ESCANEO DESDE IMAGEN
+    document.getElementById('fileInput').addEventListener('change', async function (event) {
+        // Detener la cámara antes de escanear imágenes
+        codeReader.reset();
+        if (videoElement.srcObject) {
+            let tracks = videoElement.srcObject.getTracks();
+            tracks.forEach(track => track.stop());
+            videoElement.srcObject = null;
+        }
+
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const imgElement = document.getElementById('imagenCodigo');
+        imgElement.src = URL.createObjectURL(file);
+        imgElement.classList.remove("d-none");
+
+        try {
+            const result = await codeReader.decodeFromImage(imgElement);
+            procesarCodigoEscaneado(result.text, document.getElementById('imageResult'));
+            event.target.value = ""; // Permitir escanear la misma imagen otra vez
+        } catch (err) {
+            console.error("Error al escanear (imagen):", err);
+        } finally {
+            // Reiniciar la cámara después del escaneo de la imagen
+            setTimeout(startVideoScanner, 500);
+        }
+    });
+
+    startVideoScanner();
+
+    function reproducirSonido() {
+        const sonido = new Audio('/img/beep.mp3'); // Ruta del sonido
+        sonido.play().catch(error => console.error("Error al reproducir sonido:", error));
+    }
+
+    // 📤 PROCESAR Y ENVIAR CÓDIGO
+    async function procesarCodigoEscaneado(codigo, element) {
+        const datos = extraerDatos(codigo); // Asegúrate de que devuelve un objeto
+
+        // Validar si el código de barras y el lote existen
+        if (!datos || !datos.codigoBarras || !datos.lote) {
+            element.textContent = "⚠️ Código inválido o sin datos completos.";
+            element.classList.replace("alert-info", "alert-danger");
+            return;
+        }
+
+        // Mostrar el código escaneado en pantalla
+        element.textContent = `📦 Código: ${datos.codigoBarras} | Producción: ${datos.fechaProduccion} | Expiración: ${datos.fechaExpiracion} | 🏷️ Lote: ${datos.lote}`;
+        element.classList.replace("alert-info", "alert-success");
+        element.classList.replace("alert-secondary", "alert-success");
+
+        // 🔊 Reproducir sonido cuando el código es válido
+        reproducirSonido();
+
+        // Generar clave única para el conteo
+        const clave = `${datos.codigoBarras} | ${datos.lote}`;
+        conteoTemporal[clave] = (conteoTemporal[clave] || 0) + 1;
+        actualizarListaConteo();
+
+        try {
+            const response = await fetch('/products/api/contar-productos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ codigos: Object.keys(conteoTemporal) })
+            });
+
+            const data = await response.json();
+            if (!data.success) {
+                alert(`⚠️ Error: ${data.mensaje}`);
+            }
+        } catch (error) {
+            console.error("❌ Error al enviar código al servidor:", error);
+        }
+    }
+
+    // 🔄 ACTUALIZAR LISTA DE CONTEO EN PANTALLA
+    function actualizarListaConteo() {
+        listaConteo.innerHTML = "";
+        Object.entries(conteoTemporal).forEach(([codigo, cantidad]) => {
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between align-items-center";
+            li.innerHTML = `<span>📦 ${codigo}</span> <span class="badge bg-primary">${cantidad}</span>`;
+            listaConteo.appendChild(li);
+        });
+    }
+
+
+    // 📊 FINALIZAR CONTEO Y OBTENER DIFERENCIAS
+    async function finalizarConteo() {
+        if (Object.keys(conteoTemporal).length === 0) {
+            alert("⚠️ No hay productos escaneados.");
+            return;
+        }
+
+        try {
+            const response = await fetch('/products/api/finalizar-conteo', {
+                method: 'POST',
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert("✅ Conteo finalizado. Revisa las diferencias.");
+                mostrarDiferencias(data.diferencias);
+            } else {
+                alert(`⚠️ Error: ${data.mensaje}`);
+            }
+        } catch (error) {
+            console.error("Error al finalizar conteo:", error);
+        }
+    }
+    window.finalizarConteo = finalizarConteo;
+
+    // 📋 MOSTRAR DIFERENCIAS EN PANTALLA
+    function mostrarDiferencias(diferencias) {
+        console.log("🔍 Datos recibidos en el frontend:", diferencias);
+        listaConteo.innerHTML = "";
+        let hayDiferencias = false;
+
+        diferencias.forEach(({ codigo, mensaje, en_base_datos = 0, escaneado = 0, diferencia = 0 }) => {
+            const li = document.createElement("li");
+
+            // Verificar si hay diferencia y asignar color
+            const hayError = diferencia !== 0;
+            const colorClase = hayError ? "bg-danger text-white" : "bg-success text-white";
+            const mensajeFinal = hayError ? "❌ Diferencia detectada" : "✅ Sin diferencias";
+
+            li.className = `list-group-item d-flex justify-content-between align-items-center ${colorClase}`;
+            li.innerHTML = `
+            <span>📦 ${codigo} - ${mensajeFinal}</span>
+            <span class="badge bg-light text-dark">${escaneado} / ${en_base_datos} (${diferencia})</span>`;
+
+            listaConteo.appendChild(li);
+
+            if (hayError) hayDiferencias = true;
+        });
+
+        // Mostrar el botón solo si hay diferencias
+        const btnActualizar = document.getElementById('btnActualizarInventario');
+        btnActualizar.style.display = hayDiferencias ? 'block' : 'none';
+
+        // Almacenar diferencias globalmente para usarlas después
+        window.diferencias = diferencias;
+    }
+
+    async function actualizarInventario() {
+    try {
+        const response = await fetch('/products/api/actualizar-inventario-nuevo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ diferencias: window.diferencias })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Éxito: mostrar mensaje bonito y recargar al cerrar
+            Swal.fire({
+                icon: 'success',
+                title: '¡Inventario actualizado!',
+                text: data.mensaje,
+                confirmButtonText: 'Aceptar',
+                timer: 2000,
+                timerProgressBar: true,
+                willClose: () => {
+                    location.reload();
+                }
+            });
+        } else {
+            // Advertencia o error de lógica del servidor
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atención',
+                text: data.mensaje
+            });
+        }
+
+        // Ocultar el botón de actualización
+        document.getElementById('btnActualizarInventario').style.display = 'none';
+
+    } catch (error) {
+        console.error("Error al actualizar inventario:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'No se pudo actualizar el inventario.'
+        });
+    }
+}
+    window.actualizarInventario = actualizarInventario;
+</script>

@@ -1,0 +1,61 @@
+<div class="container p-4">
+    <div class="row">
+        <div class="col-md-4 mx-auto">
+            <div class="card text-center">
+                <div class="card-header">
+                    <h3>Inicia Sesión</h3>
+                </div>
+                <div class="card-body">
+                    <img src="/img/logo2.png" alt="Logo Macrodent" class="card-img-top mx-auto m-2 rounded-circle w-50">
+                    <form action="/signin" method="POST">
+                        <div class="form-group">
+                            <input type="text" name="username" placeholder="Ingrese su usuario" class="form-control" autofocus required>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <!-- Input para la contraseña -->
+                                <input type="password" name="password" id="password" class="form-control" placeholder="Ingrese su contraseña" autofocus required>
+
+                                <!-- Icono para mostrar/ocultar la contraseña -->
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="toggle-password">
+                                        <i class="fa fa-eye-slash" id="eye-icon"></i> <!-- El ícono de ojo (oculto por defecto) -->
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-block">
+                                Iniciar Sesión
+                            </button>
+                        </div>
+                    </form>
+                    <!-- Enlace para la recuperación de contraseña -->
+                    <div class="mt-3">
+                        <a href="/forgotpassword" class="text-muted">¿Olvidaste tu contraseña?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Obtener el input y el icono de ojo
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eye-icon');
+    const togglePassword = document.getElementById('toggle-password');
+
+    // Función para mostrar/ocultar la contraseña
+    togglePassword.addEventListener('click', function() {
+        // Si la contraseña está oculta, mostrarla
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.remove('fa-eye-slash'); // Quitar el ícono de ojo cerrado
+            eyeIcon.classList.add('fa-eye'); // Mostrar el ícono de ojo abierto
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.remove('fa-eye'); // Quitar el ícono de ojo abierto
+            eyeIcon.classList.add('fa-eye-slash'); // Volver a mostrar el ícono de ojo cerrado
+        }
+    });
+</script>

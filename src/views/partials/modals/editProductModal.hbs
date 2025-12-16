@@ -1,0 +1,60 @@
+<!-- Modal de edición Producto -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Editar Producto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/products/update/{{this.id_productos}}" method="POST" enctype="multipart/form-data">
+                    <!-- Campos del formulario -->
+                    <input type="hidden" name="id_productos" id="edit_id_producto">
+                    <div class="form_group mb-3">
+                        <label for="edit_nombre" class="form-label">Nombre del Producto</label>
+                        <input type="text" class="form-control" name="nombre" id="edit_nombre" required>
+                    </div>
+                    <div class="form_group mb-3">
+                        <label for="edit_codigo_barras" class="form-label">Código de Barras</label>
+                        <input type="text" class="form-control" name="codigo_barras" id="edit_codigo_barras" required>
+                    </div>
+                    <div class="form_group mb-3">
+                        <label for="edit_presentacion" class="form-label">Presentación</label>
+                        <input type="text" class="form-control" name="presentacion" id="edit_presentacion" required>
+                    </div>
+                    <div class="form_group mb-3">
+                        <label for="edit_tamano" class="form-label">Tamaño</label>
+                        <input type="text" class="form-control" name="tamano" id="edit_tamano" required>
+                    </div>
+                    <div class="form_group mb-3">
+                        <label for="edit_color" class="form-label">Color</label>
+                        <input type="text" class="form-control" name="color" id="edit_color" required>
+                    </div>
+                    <div class="form_group mb-3">
+                        <label for="edit_reg_invima" class="form-label">Registro INVIMA</label>
+                        <input type="text" class="form-control" name="reg_invima" id="edit_reg_invima" required>
+                    </div>
+                    <div class="form_group mb-3">
+                        <label for="edit_proovedor" class="form-label">Proveedor</label>
+                        <input type="text" class="form-control" name="proovedor" id="edit_proovedor" required>
+                    </div>
+                    <div class="form_group mb-3">
+                        <label for="edit_descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" name="descripcion" id="edit_descripcion" rows="4"></textarea>
+                    </div>
+                    <div class="form_group mb-3">
+                        <label for="edit_stock_minimo" class="form-label">Stock Minimo</label>
+                        <input type="number" class="form-control" name="stock_minimo" id="edit_stock_minimo" required>
+                    </div>
+                    <div class="form_group mb-3">
+                        <label for="edit_image" class="form-label">Imagen del Producto</label>
+                        <input type="file" class="form-control" name="image" id="edit_image" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Actualizar Producto</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

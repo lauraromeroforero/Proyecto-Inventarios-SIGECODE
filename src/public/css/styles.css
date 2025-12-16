@@ -1,0 +1,297 @@
+/* === Design System: Macrodent Inventory (added by ChatGPT) === */
+:root{
+  --color-primary: #1C2D52;
+  --color-primary-600:#24386e;
+  --color-accent:  #2BBBAD;
+  --color-bg:      #F5F7FB;
+  --color-text:    #1f2937;
+  --radius: 16px;
+  --shadow: 0 8px 24px rgba(0,0,0,.08);
+}
+html, body{
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  min-height:100vh;
+}
+a{ color: var(--color-primary); }
+a:hover{ color: var(--color-primary-600); }
+
+.navbar{ box-shadow: var(--shadow); border:0; }
+.navbar-brand{ font-weight:700; letter-spacing:.2px; }
+
+.card{ border:0 !important; border-radius: var(--radius) !important; box-shadow: var(--shadow); }
+.card-title{ font-weight:700; }
+
+.btn{ border-radius: 12px; font-weight:600; letter-spacing:.2px; transition: transform .05s ease, box-shadow .2s ease; }
+.btn:active{ transform: translateY(1px); }
+.btn-primary{ background: var(--color-primary); border-color: var(--color-primary); }
+.btn-primary:hover{ background: var(--color-primary-600); border-color: var(--color-primary-600); }
+.btn-success{ background: var(--color-accent); border-color: var(--color-accent); }
+.btn-success:hover{ filter: brightness(.95); }
+
+.badge-soft{ background:#e8eefc; color:var(--color-primary); border-radius:999px; padding:.35rem .6rem; font-weight:600; }
+
+.table-modern{ background:#fff; border-radius: var(--radius); overflow:hidden; box-shadow: var(--shadow); }
+.table-modern thead th{ background:#f2f5ff; border:0; font-weight:700; }
+.table-modern tbody td{ vertical-align: middle; }
+
+.page-wrap{ padding-top:30px; padding-bottom:40px; }
+
+.modal-content{ border:0; border-radius: var(--radius); box-shadow: var(--shadow); }
+.modal-header{ background:#f2f5ff; border-bottom:0; }
+.modal-title{ font-weight:700; }
+
+.empty-state{ text-align:center; padding:40px 20px; background:#fff; border-radius: var(--radius); box-shadow: var(--shadow); }
+.empty-state i{ font-size:42px; opacity:.6; }
+
+body {
+    background-color: #f4f6fae3; /* Fondo suave que va con tus íconos */
+    font-family: 'Segoe UI', sans-serif;
+    overflow: auto;
+    position: relative;
+    min-height: 100vh;
+    padding-top: 50px;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/img/fondo1.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    z-index: -1;
+}
+
+.navbar {
+    color: white;
+    background-color: #1C2D52;
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link {
+    color: white !important;
+}
+
+.navbar .dropdown-item:hover {
+    background-color: #7f90b9;
+}
+
+.index img {
+    width: 15rem;
+}
+
+/* Estilo para los botones */
+.custom-btn {
+    background-color: #59a6d6;
+    /* Azul claro */
+    border: none;
+    color: white;
+    padding: 7px 7px;
+    font-size: 14px;
+    margin-right: 5px;
+    /* Hacer los botones más juntos */
+    border-radius: 50%;
+    transition: background-color 0.1s ease;
+}
+
+/* Efecto hover cuando el cursor pasa sobre el botón */
+.custom-btn:hover {
+    background-color: #00376e;
+    /* Azul oscuro */
+}
+
+/* Asegurarse de que los iconos estén centrados dentro del botón */
+.custom-btn i {
+    font-size: 1px;
+    /* Tamaño de los iconos */
+}
+
+/* Estilo para el botón de Editar (azul claro) */
+.custom-btn-edit {
+    background-color: #80c7f2;
+    /* Azul claro */
+}
+
+.custom-btn-edit:hover {
+    background-color: #00376e;
+    /* Azul oscuro */
+}
+
+/* Estilo para el botón de Eliminar (rojo claro) */
+.custom-btn-delete {
+    background-color: #f28f8f;
+    /* Rojo claro */
+}
+
+.custom-btn-delete:hover {
+    background-color: #d04b4b;
+    /* Rojo oscuro */
+}
+
+/* Estilo para el botón de Incrementar más (verde claro) */
+.custom-btn-add {
+    background-color: #80e0a7;
+    /* Verde claro */
+}
+
+.custom-btn-add:hover {
+    background-color: #3f9e6f;
+    /* Verde oscuro */
+}
+
+/* Estilo para el botón de Descontar más (verde claro) */
+.custom-btn-minus {
+    background-color: #e0ce80;
+    /* Amarillo claro */
+}
+
+.custom-btn-minus:hover {
+    background-color: #dfd21d;
+    /* Amarillo oscuro */
+}
+
+/* Asegurarse de que los iconos estén centrados dentro del botón */
+.custom-btn i {
+    font-size: 18px;
+    /* Tamaño de los iconos */
+}
+
+/* Style products/all */
+
+/* Estilo para el contenedor flotante */
+.product-popup {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    color: #00376e;
+    border-radius: 15px;
+    padding: 20px;
+    max-width: 350px;
+    width: 90%;
+    min-height: 100px;
+    /* Altura mínima */
+    overflow-y: auto;
+    /* Permite desplazamiento si hay demasiados datos */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 9999;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: scale(0.9);
+}
+
+/* Mostrar popup cuando el ratón pasa por encima de la tarjeta */
+.card-img-top:hover .product-popup {
+    display: block;
+    /* Muestra el popup */
+    transform: scale(1);
+    /* Vuelve a tamaño original con suavidad */
+}
+
+/* Estilo de contenido dentro del popup */
+.popup-content {
+    height: 100%;
+    /* Ocupa toda la altura del popup */
+    overflow: hidden;
+    /* Sin desplazamiento */
+}
+
+/* Título del popup */
+.popup-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #00376e;
+    /* Título azul oscuro */
+}
+
+/* Estilo para cada detalle */
+.popup-content p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+/* Color para los títulos dentro del popup */
+.popup-content strong {
+    color: #00376e;
+    /* Títulos en azul oscuro */
+}
+
+/* Agregar sombra de texto para mejor legibilidad */
+.popup-content p,
+.popup-content strong {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/*ESTILOS LISTA DE REMISIONES*/
+
+
+    .custom-table {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    .custom-table th, .custom-table td {
+        text-align: center;
+        vertical-align: middle !important;
+    }
+
+    .custom-table th {
+        background-color: #004080; /* Azul oscuro de tu barra */
+        color: white;
+    }
+
+    .custom-table tbody tr:nth-child(even) {
+        background-color: #f0f4f9;
+    }
+
+    .custom-table a {
+        color: #0066cc;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .custom-table a:hover {
+        text-decoration: underline;
+    }
+
+    .table-container {
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #004080;
+        margin-bottom: 30px;
+    }
+    
+    /* === GRID RESPONSIVE PARA PRODUCTOS === */
+.products-grid{
+  display: grid;
+  gap: 18px;                     /* espacio entre tarjetas */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  align-items: stretch;
+  margin: 16px 0 32px;
+}
+
+/* breakpoints finos por si quieres forzar columnas máximas */
+@media (min-width: 1200px){
+  .products-grid{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (min-width: 992px) and (max-width: 1199.98px){
+  .products-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 768px) and (max-width: 991.98px){
+  .products-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

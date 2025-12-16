@@ -1,0 +1,75 @@
+<!-- Modal de lotes agrupados -->
+<div class="modal fade" id="lotesModal-{{this.id_productos}}" tabindex="-1" role="dialog"
+    aria-labelledby="lotesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Lotes de {{this.nombre}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Número de Lote</th>
+                            <th>Cantidad Total</th>
+                            <th>Fecha de Ingreso</th>
+                            <th>Fecha de Vencimiento</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each this.lotes_agrupados}}
+                        <tr>
+                            <td>{{this.nro_lote}}</td>
+                            <td>{{this.cantidad}}</td>
+                            <td>{{formatFecha this.fecha_ingreso}} - {{formatHora this.fecha_ingreso}}</td>
+                            <td>{{formatFecha this.fecha_vencimiento}}</td>
+                            <td>
+                                <div style="display:flex; gap:10px;">
+                                    <!-- Botón Editar lote -->
+                                    <button class="btn btn-sm btn-outline-primary"
+                                        onclick="cargarDatosEditarLote('{{this.nro_lote}}','{{this.cantidad}}','{{../id_productos}}','lotesModal-{{../id_productos}}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <!-- Botón Eliminar lote como enlace -->
+                                    <a class="btn btn-sm btn-outline-danger" href="/products/delete-lote/{{this.id_lote}}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let modalPadreAbierto = null;
+
+    function cargarDatosEditarLote(nroLote, cantidad, idProducto, modalPadreID) {
+        document.getElementById('editar_nro_lote').value = nroLote;
+        document.getElementById('editar_cantidad').value = cantidad;
+        document.getElementById('editar_id_productos').value = idProducto;
+
+        modalPadreAbierto = modalPadreID;
+
+        $('#' + modalPadreID).modal('hide');
+
+        setTimeout(function () {
+            $('#editarLoteModal').modal('show');
+        }, 200);
+    }
+
+    // Cuando se cierre el modal de editar, reabre el padre
+    $('#editarLoteModal').on('hidden.bs.modal', function () {
+        if (modalPadreAbierto) {
+            $('#' + modalPadreAbierto).modal('show');
+        }
+    });
+</script>

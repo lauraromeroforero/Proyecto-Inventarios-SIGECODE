@@ -1,0 +1,67 @@
+<div class="container p-4">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3>Agregar Nuevo Producto</h3>
+                </div>
+                <div class="card-body">
+                    <form action="/products/add" method="POST" enctype="multipart/form-data">
+                        <!-- Nombre del producto -->
+                        <div class="form-group mb-3">
+                            <label for="nombre" class="form-label">Nombre del Producto</label>
+                            <input type="text" class="form-control" name="nombre" id="nombre" placeholder="Nombre del producto" required>
+                        </div>
+                        <!-- Código de barras -->
+                        <div class="form-group mb-3">
+                            <label for="codigo_barras" class="form-label">Código de Barras</label>
+                            <input type="text" class="form-control" name="codigo_barras" id="codigo_barras" placeholder="Código de barras" required>
+                        </div>
+                        <!-- Presentación -->
+                        <div class="form-group mb-3">
+                            <label for="presentacion" class="form-label">Presentación</label>
+                            <input type="text" class="form-control" name="presentacion" id="presentacion" placeholder="Presentación del producto" required>
+                        </div>
+                        <!-- Tamaño -->
+                        <div class="form-group mb-3">
+                            <label for="tamano" class="form-label">Tamaño</label>
+                            <input type="text" class="form-control" name="tamano" id="tamano" placeholder="Tamaño del producto" required>
+                        </div>
+                        <!-- Color -->
+                        <div class="form-group mb-3">
+                            <label for="color" class="form-label">Color</label>
+                            <input type="text" class="form-control" name="color" id="color" placeholder="Color del producto" required>
+                        </div>
+                        <!-- Registro INVIMA -->
+                        <div class="form-group mb-3">
+                            <label for="reg_invima" class="form-label">Registro INVIMA</label>
+                            <input type="text" class="form-control" name="reg_invima" id="reg_invima" placeholder="Registro INVIMA del producto" required>
+                        </div>
+                        <!-- Proveedor -->
+                        <div class="form-group mb-3">
+                            <label for="proovedor" class="form-label">Proveedor</label>
+                            <input type="text" class="form-control" name="proovedor" id="proovedor" placeholder="Proveedor del producto" required>
+                        </div>
+                        <!-- Descripción -->
+                        <div class="form-group mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" name="descripcion" id="descripcion" placeholder="Descripción del producto" rows="4"></textarea>
+                        </div>
+                        <!-- Stock Minimo -->
+                        <div class="form-group mb-3">
+                            <label for="stock_minimo" class="form-label">Stock Minimo</label>
+                            <input type="number" class="form-control" name="stock_minimo" id="stock_minimo" placeholder="Stock Minimo" required>
+                        </div>
+                        <!-- Imagen del producto -->
+                        <div class="form-group mb-3">
+                            <label for="image" class="form-label">Imagen del Producto</label>
+                            <input type="file" class="form-control" name="image" id="image" accept="image/*">
+                        </div>
+                        <!-- Botón de envío -->
+                        <button type="submit" class="btn btn-success w-100">Guardar Producto</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

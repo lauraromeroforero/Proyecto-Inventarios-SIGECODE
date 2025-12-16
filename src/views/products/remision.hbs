@@ -1,0 +1,176 @@
+<div class="table-container">
+    <h1>📄 Lista de Remisiones</h1>
+
+    <table class="table table-bordered custom-table">
+        <thead>
+            <tr>
+                <th>Operario</th>
+                <th>Fecha de Remisión</th>
+                <th>Firmar Entrega</th>
+                <th>Firmar Recibido</th>
+                <th>Ver PDF</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each remisiones}}
+                <tr>
+                    <td>{{username}}</td>
+                    <td>{{formatFecha this.fecha_remision}} / {{formatHora this.fecha_remision}}</td>
+                    <td>
+                        {{#if firma_entrega}}
+                            ✔️ Firmado Por {{entregado_por_nombre}}
+                        {{else}}
+                            <button class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#modalFirmaEntrega" onclick="abrirModalFirmaEntrega({{id_remision}})">
+                                🖋️ Firmar
+                            </button>
+                        {{/if}}
+                    </td>
+                    <td>
+                        {{#if firma_recibe}}
+                            ✔️ Firmado Por {{recibido_por_nombre}}
+                        {{else}}
+                            <button class="btn btn-sm btn-outline-success" data-toggle="modal" data-target="#modalFirmaRecibe" onclick="abrirModalFirmaRecibe({{id_remision}})">
+                                🖋️ Firmar
+                            </button>
+                        {{/if}}
+                    </td>
+                    <td>
+                        <a href="/products/remision/pdf/{{id_remision}}" target="_blank">📄 Ver PDF</a>
+                    </td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+<!-- MODAL: Firmar Entrega -->
+<div class="modal fade" id="modalFirmaEntrega" tabindex="-1" role="dialog" aria-labelledby="firmaEntregaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form id="formFirmaEntrega">
+        <div class="modal-header">
+          <h5 class="modal-title" id="firmaEntregaLabel">✍️ Firma de Entrega</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body text-center">
+          <canvas id="canvasEntrega" width="400" height="150" style="border:1px solid #ccc;"></canvas>
+          <br>
+          <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="limpiarFirma('canvasEntrega')">🧹 Limpiar</button>
+          <input type="hidden" name="firmaEntregaBase64" id="firmaEntregaBase64">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar Firma</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Firmar Recibido -->
+<div class="modal fade" id="modalFirmaRecibe" tabindex="-1" role="dialog" aria-labelledby="firmaRecibeLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form id="formFirmaRecibe">
+        <div class="modal-header">
+          <h5 class="modal-title" id="firmaRecibeLabel">✍️ Firma de Recibido</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body text-center">
+          <canvas id="canvasRecibe" width="400" height="150" style="border:1px solid #ccc;"></canvas>
+          <br>
+          <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="limpiarFirma('canvasRecibe')">🧹 Limpiar</button>
+          <input type="hidden" name="firmaRecibeBase64" id="firmaRecibeBase64">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar Firma</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+function abrirModalFirmaEntrega(id) {
+    document.getElementById('formFirmaEntrega').dataset.id = id;
+}
+
+function abrirModalFirmaRecibe(id) {
+    document.getElementById('formFirmaRecibe').dataset.id = id;
+}
+function initCanvas(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext("2d");
+  let painting = false;
+
+  canvas.addEventListener("mousedown", () => (painting = true));
+  canvas.addEventListener("mouseup", () => (painting = false, ctx.beginPath()));
+  canvas.addEventListener("mouseleave", () => (painting = false, ctx.beginPath()));
+
+  canvas.addEventListener("mousemove", (e) => {
+    if (!painting) return;
+    const rect = canvas.getBoundingClientRect();
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#000";
+    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  });
+}
+
+function limpiarFirma(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// Inicializar ambos canvas cuando el DOM esté listo
+window.onload = () => {
+  initCanvas("canvasEntrega");
+  initCanvas("canvasRecibe");
+};
+
+document.getElementById('formFirmaEntrega').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const canvas = document.getElementById("canvasEntrega");
+    const idRemision = this.dataset.id; // Asegúrate de ponerlo en el form
+    const firmaBase64 = canvas.toDataURL();
+
+    const res = await fetch(`/products/remision/firmar-entrega/${idRemision}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firmaEntregaBase64: firmaBase64 })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+        alert('✔️ Firma de entrega guardada');
+        location.reload();
+    } else {
+        alert('❌ Error al guardar firma');
+    }
+});
+
+document.getElementById('formFirmaRecibe').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const canvas = document.getElementById("canvasRecibe");
+    const idRemision = this.dataset.id;
+    const firmaBase64 = canvas.toDataURL();
+
+    const res = await fetch(`/products/remision/firmar-recibe/${idRemision}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firmaRecibeBase64: firmaBase64 })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+        alert('✔️ Firma de recibido guardada');
+        location.reload();
+    } else {
+        alert('❌ Error al guardar firma');
+    }
+});
+</script>

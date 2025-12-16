@@ -1,0 +1,35 @@
+<!-- 🔵 Modal SUBIR EXCEL PRODUCTOS -->
+<div class="modal fade" id="uploadExcelModalProducts" tabindex="-1" role="dialog"
+  aria-labelledby="uploadExcelModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content shadow-lg border-0" style="border-radius: 12px; overflow: hidden;">
+      <div class="modal-header" style="background-color: #1f2f57; color: #ffffff;">
+        <h5 class="modal-title mb-0" id="uploadExcelModalLabel">
+          📂 Subir archivo Excel de Productos
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-4" style="background-color: #f5f7fa;">
+        <form action="/products/upload-excel-products" method="POST" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="excelFile" class="font-weight-bold" style="color: #1f2f57;">
+              Selecciona tu archivo Excel:
+            </label>
+            <input type="file" class="form-control-file border p-2 rounded bg-white" name="excelFile" id="excelFile"
+              accept=".xlsx, .xls" required>
+          </div>
+          <div class="d-flex justify-content-end mt-4">
+            <button type="button" class="btn mr-2" style="background-color: #6c757d; color: #ffffff; border: none;">
+              Cancelar
+            </button>
+            <button type="submit" class="btn" style="background-color: #1f2f57; color: #ffffff; border: none;">
+              ✅ Subir y Actualizar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

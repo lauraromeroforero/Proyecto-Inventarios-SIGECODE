@@ -1,0 +1,29 @@
+<!-- Modal para seleccionar cantidad -->
+<div class="modal fade" id="remisionModal-{{this.id_productos}}" tabindex="-1" role="dialog"
+    aria-labelledby="remisionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reducir producto a remisión</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/products/remision/agregar" method="POST">
+                <div class="modal-body">
+                    <!-- Ya no se necesita el selector de lote -->
+                    <input type="hidden" name="id_productos" value="{{this.id_productos}}">
+                    <input type="hidden" name="nombre_producto" value="{{this.nombre}}">
+                    <!-- Solo pedimos cantidad -->
+                    <div class="form-group">
+                        <label for="cantidad">Cantidad:</label>
+                        <input type="number" name="cantidad" min="1" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Agregar al carrito</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

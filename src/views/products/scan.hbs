@@ -1,0 +1,84 @@
+<div class="container py-3" style="max-width: 500px;">
+    <h4 class="text-center text-primary mb-3">Escáner de Códigos</h4>
+    <div class="card shadow-sm p-3 mb-3 bg-white rounded">
+        <div class="text-center" id="videoContainer">
+            <video id="video" class="rounded border border-primary shadow-sm" width="100%" height="auto" autoplay></video>
+        </div>
+        <p id="result" class="alert alert-info text-center mt-2">Escaneando código...</p>
+    </div>
+    <div class="card shadow-sm p-3 bg-white rounded">
+        <div class="text-center">
+            <label for="fileInput" class="form-label fw-bold">Subir imagen</label>
+            <input type="file" id="fileInput" class="form-control mb-2" accept="image/*">
+            <img id="imagenCodigo" class="d-none mx-auto img-thumbnail shadow-sm" style="max-width: 100%;">
+        </div>
+        <p id="imageResult" class="alert alert-secondary text-center mt-2">Escaneando código...</p>
+    </div>
+</div>
+<script type="module">
+    import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/library@latest/+esm';
+
+    const codeReader = new BrowserMultiFormatReader();
+    const videoElement = document.getElementById('video');
+    const resultElement = document.getElementById('result');
+    let lastScanTime = 0;
+
+    // 📷 ESCANEO EN TIEMPO REAL (VIDEO)
+    function startVideoScanner() {
+        codeReader.decodeFromVideoDevice(null, videoElement, (result, err) => {
+            const now = Date.now();
+            if (result && now - lastScanTime > 3500) {
+                lastScanTime = now;
+                resultElement.textContent = `Código: ${result.text}`;
+                resultElement.classList.replace("alert-info", "alert-success");
+                console.log("Código escaneado (video):", result.text);
+                sendBarcodeToServer(result.text);
+            }
+            if (err) console.error("Error al escanear (video):", err);
+        }).catch(error => console.error("Error al acceder a la cámara:", error));
+    }
+
+    startVideoScanner();
+
+    // 📸 ESCANEO DESDE IMAGEN
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const imgElement = document.getElementById('imagenCodigo');
+            imgElement.src = URL.createObjectURL(file);
+            imgElement.classList.remove("d-none");
+            
+            setTimeout(() => {  // Asegura que siempre lee una nueva imagen
+                codeReader.decodeFromImage(imgElement)
+                    .then(result => {
+                        document.getElementById('imageResult').textContent = `Código: ${result.text}`;
+                        document.getElementById('imageResult').classList.replace("alert-secondary", "alert-success");
+                        console.log("Código escaneado (imagen):", result.text);
+                        sendBarcodeToServer(result.text);
+                        // Reset input para permitir escanear la misma imagen
+                        event.target.value = "";
+                        startVideoScanner();
+                    })
+                    .catch(err => console.error("Error al escanear (imagen):", err));
+            }, 500); // Espera breve antes de procesar la nueva imagen
+        }
+    });
+
+    // 📤 ENVIAR CÓDIGO AL SERVIDOR
+    function sendBarcodeToServer(barcode) {
+        fetch('/products/api/actualizar-inventario', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ codigo: barcode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`✅ Inventario actualizado: ${data.mensaje}`);
+            } else {
+                alert(`⚠️ Error: ${data.mensaje}`);
+            }
+        })
+        .catch(error => console.error("Error al enviar código al servidor:", error));
+    }
+</script>

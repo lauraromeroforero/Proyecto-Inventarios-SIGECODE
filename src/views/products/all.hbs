@@ -1,0 +1,98 @@
+<div class="container p-4">
+    <h3 class="text-center mb-4">Productos en Inventario</h3>
+    <div class="d-flex justify-content-between mt-4">
+        <!-- 🛒 Carrito -->
+        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#carritoModal">
+            🛒 Ver Carrito de Remisión <span class="badge badge-pill badge-danger">{{carrito.length}}</span>
+        </button>
+        <!-- ⬇️ Botón para abrir Modal Subir Excel Lotes-->
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadExcelModal">
+            ⬆️ Subir Nuevos Lotes
+        </button>
+    </div><br>
+    <div class="row">
+        {{#each products}}
+        <div class="col-md-3 mb-4">
+            <div class="card" style="border-radius: 20px; border: 2px solid #1C2D52; position: relative;">
+                <!-- Contenedor interno para la imagen -->
+                <div style="border-radius: 15px; padding: 20px 20px 0 20px; overflow: hidden;" class="card-img-top">
+                    {{#if this.img}}
+                    <img class="card-img-top" src="data:image/jpeg;base64,{{this.img}}" alt="{{this.nombre}}"
+                        style="width: 100%; height: 200px; object-fit: cover;">
+                    {{else}}
+                    <img class="card-img-top" src="/img/logo.png" alt="Imagen no disponible"
+                        style="width: 100%; height: 200px; object-fit: cover;">
+                    {{/if}}
+                    <!--Ventana flotante con los detalles (oculta inicialmente)-->
+                    <div class="product-popup">
+                        <div class="popup-content">
+                            <h5 class="popup-title">{{this.nombre}}</h5>
+                            <p><strong>Código de barras:</strong> {{this.codigo_barras}}</p>
+                            <p><strong>Presentación:</strong> {{this.presentacion}}</p>
+                            <p><strong>Tamaño:</strong> {{this.tamano}}</p>
+                            <p><strong>Color:</strong> {{this.color}}</p>
+                            <p><strong>Registro INVIMA:</strong> {{this.reg_invima}}</p>
+                            <p><strong>Proveedor:</strong> {{this.proovedor}}</p>
+                            <p><strong>Descripción:</strong> {{this.descripcion}}</p>
+                            <p><strong>Stock Minimo:</strong> {{this.stock_minimo}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Nombre del Producto -->
+                    <h5 class="card-title font-weight-bold">
+                        <img src="/img/favicon.ico" alt="">
+                        - <a href="#" data-toggle="modal" data-target="#lotesModal-{{this.id_productos}}">{{ this.nombre}}</a>
+                    </h5>
+                    <!-- Cantidad -->
+                    <p class="card-text" style="line-height: 0.5;">
+                        <span style="color: #00376e;">Cantidad:</span>
+                        <small>{{this.cantidad_total}}</small>
+                    </p>
+                    <!-- Presentacion-->
+                    <p class="card-text" style="line-height: 1.2;">
+                        <span style="color: #00376e;">presentacion:</span>
+                        <small>{{this.presentacion}}</small>
+                    </p>
+                    <!-- Botones de acción -->
+                    <div class="d-flex gap-2 justify-content-between mt-3" style="flex-wrap: nowrap;">
+                        <!-- Botón de editar -->
+                        <button type="button" class="btn btn-sm custom-btn custom-btn-edit btn-outline-primary px-2"
+                            data-toggle="modal" data-target="#editModal"
+                            onclick="openEditModal({{this.id_productos}}, '{{this.nombre}}', '{{this.codigo_barras}}', '{{this.tamano}}', '{{this.color}}', '{{this.descripcion}}', '{{this.reg_invima}}', '{{this.presentacion}}', '{{this.proovedor}}', '{{this.stock_minimo}}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <!-- Botón de eliminar -->
+                        <form action="/products/delete/{{this.id_productos}}" method="GET"
+                            onsubmit="return confirm('¿Estás seguro de eliminar este producto?');">
+                            <button type="submit"
+                                class="btn btn-sm custom-btn custom-btn-delete btn-outline-primary px-2">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                        <!-- Botón para agregar más cantidad -->
+                        <button class="btn btn-sm custom-btn custom-btn-add btn-outline-primary px-2"
+                            data-toggle="modal" data-target="#cantidadmasModal"
+                            onclick="openIncreaseQuantityModal({{this.id_productos}})">
+                            <i class="fas fa-plus-circle"></i>
+                        </button>
+                        <!-- Botón para menos cantidad -->
+                        <button class="btn btn-sm custom-btn custom-btn-minus btn-outline-primary px-2"
+                            data-toggle="modal" data-target="#remisionModal-{{this.id_productos}}"
+                            onclick="cargarLotes('{{this.id_productos}}')">
+                            <i class="fas fa-minus-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{> modals/editProductModal this}}
+        {{> modals/addLoteModal this}}
+        {{> modals/remisionModal this}}
+        {{> modals/lotesGroupedModal this}}
+        {{> modals/editLoteModal this}}
+        {{/each}}
+        {{> modals/cartModal this}}
+        {{> modals/uploadExcelLotesModal this}}
+    </div>
+</div>

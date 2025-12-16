@@ -1,0 +1,29 @@
+{{#if success}}
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: '{{success.[0]}}'
+        });
+    </script>
+    {{/if}}
+
+    {{#if warning}}
+    <script>
+        Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: '{{warning.[0]}}'
+        });
+    </script>
+    {{/if}}
+
+    {{#if error}}
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '{{error.[0]}}'
+        });
+    </script>
+    {{/if}}

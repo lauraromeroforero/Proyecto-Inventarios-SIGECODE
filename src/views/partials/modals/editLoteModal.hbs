@@ -1,0 +1,43 @@
+<!-- Modal para Editar Lote -->
+<div class="modal fade" id="editarLoteModal" tabindex="-1" role="dialog" aria-labelledby="editarLoteLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="editarLoteForm" method="POST" action="/products/update-lote">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarLoteLabel">Editar Lote</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- ✅ Ahora SIN id_lote -->
+                    <!-- id_productos oculto -->
+                    <input type="hidden" name="id_productos" id="editar_id_productos">
+
+                    <!-- nro_lote visible, pero readonly -->
+                    <div class="form-group">
+                        <label for="editar_nro_lote">Número de Lote</label>
+                        <input type="text" class="form-control" id="editar_nro_lote" name="nro_lote" readonly>
+                    </div>
+
+                    <!-- cantidad editable -->
+                    <div class="form-group">
+                        <label for="editar_cantidad">Cantidad</label>
+                        <input type="number" class="form-control" id="editar_cantidad" name="cantidad" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    <button type="button" class="btn btn-secondary" onclick="cancelarEdicion()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function cancelarEdicion() {
+        $('#editarLoteModal').modal('hide');
+    }
+</script>
